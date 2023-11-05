@@ -6,8 +6,8 @@ require (
 	github.com/frostbyte73/core v0.0.9
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-logr/logr v1.3.0
-	github.com/livekit/protocol v1.8.1
-	github.com/livekit/server-sdk-go v1.1.2-0.20231101095512-c80fd8cf5dfc
+	github.com/livekit/protocol v1.9.1-0.20231113172556-bde1802664ba
+	github.com/livekit/server-sdk-go v1.1.2-0.20231113172812-697d58eb4f12
 	github.com/manifoldco/promptui v0.9.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pion/rtcp v1.2.10
@@ -38,7 +38,7 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.4.0 // indirect
-	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/jxskiss/base62 v1.1.0 // indirect
 	github.com/klauspost/compress v1.17.2 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
