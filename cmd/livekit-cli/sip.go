@@ -196,7 +196,7 @@ func listSipTrunk(c *cli.Context) error {
 			continue
 		}
 
-		table.Append([]string{item.SipTrunkId, strings.Join(item.Addresses, ","), item.To, strings.Join(item.AllowedDestinationsRegex, ",")})
+		table.Append([]string{item.SipTrunkId, strings.Join(item.InboundAddresses, ","), item.OutboundNumber, strings.Join(item.InboundNumbersRegex, ",")})
 	}
 	table.Render()
 
