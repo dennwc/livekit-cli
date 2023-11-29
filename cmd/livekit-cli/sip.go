@@ -183,6 +183,17 @@ func createSIPTrunk(c *cli.Context) error {
 	return nil
 }
 
+func userPass(user string, hasPass bool) string {
+	if user == "" && !hasPass {
+		return ""
+	}
+	passStr := ""
+	if hasPass {
+		passStr = "****"
+	}
+	return user + " / " + passStr
+}
+
 func listSipTrunk(c *cli.Context) error {
 	res, err := sipClient.ListSIPTrunk(context.Background(), &livekit.ListSIPTrunkRequest{})
 	if err != nil {
@@ -190,13 +201,21 @@ func listSipTrunk(c *cli.Context) error {
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"SipTrunkId", "Addresses", "To", "AllowedDestinationsRegex"})
+	table.SetHeader([]string{
+		"SipTrunkId",
+		"InboundAddresses", "InboundNumbersRegex", "InboundAuth",
+		"OutboundAddress", "OutboundNumber", "OutboundAuth",
+	})
 	for _, item := range res.Items {
 		if item == nil {
 			continue
 		}
 
-		table.Append([]string{item.SipTrunkId, strings.Join(item.InboundAddresses, ","), item.OutboundNumber, strings.Join(item.InboundNumbersRegex, ",")})
+		table.Append([]string{
+			item.SipTrunkId,
+			strings.Join(item.InboundAddresses, ","), strings.Join(item.InboundNumbersRegex, ","), userPass(item.InboundUsername, item.InboundPassword != ""),
+			item.OutboundAddress, item.OutboundNumber, userPass(item.OutboundUsername, item.OutboundPassword != ""),
+		})
 	}
 	table.Render()
 
@@ -256,13 +275,21 @@ func listSipDispatchRule(c *cli.Context) error {
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"SipDispatchRuleId"})
+	table.SetHeader([]string{"SipDispatchRuleId", "SipTrunkIds", "RoomName", "Pin"})
 	for _, item := range res.Items {
 		if item == nil {
 			continue
 		}
-
-		table.Append([]string{item.SipDispatchRuleId})
+		var room, pin string
+		switch r := item.GetRule().GetRule().(type) {
+		case *livekit.SIPDispatchRule_DispatchRuleDirect:
+			room = r.DispatchRuleDirect.RoomName
+			pin = r.DispatchRuleDirect.Pin
+		case *livekit.SIPDispatchRule_DispatchRuleIndividual:
+			room = r.DispatchRuleIndividual.RoomPrefix + "*"
+			pin = r.DispatchRuleIndividual.Pin
+		}
+		table.Append([]string{item.SipDispatchRuleId, strings.Join(item.TrunkIds, ","), room, pin})
 	}
 	table.Render()
 
@@ -322,13 +349,13 @@ func listSipParticipant(c *cli.Context) error {
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"SipParticipantId"})
+	table.SetHeader([]string{"SipParticipantId", "SipTrunkId", "CallTo", "RoomName", "Identity"})
 	for _, item := range res.Items {
 		if item == nil {
 			continue
 		}
 
-		table.Append([]string{item.SipParticipantId})
+		table.Append([]string{item.SipParticipantId, item.SipTrunkId, item.SipCallTo, item.RoomName, item.ParticipantIdentity})
 	}
 	table.Render()
 
